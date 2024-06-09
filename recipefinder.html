@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Finder</title>
+<style>
+ 
+</style>
+</head>
+<body>
+  <h1>Recipe Finder</h1>
+  <form id="searchForm">
+    <label for="ingredientInput">Enter ingredients (comma separated):</label>
+    <input type="text" id="ingredientInput" placeholder="e.g., tomato, onion, cheese">
+    <button type="submit">Search</button>
+  </form>
+  
+  <h2>Search Results</h2>
+  <ul id="recipeList"></ul>
+
+  <h2>Favorites</h2>
+  <ul id="favoritesList"></ul>
+
+  <script>
+    // Sample data for recipes
+    const recipes = [
+      {
+        name: "Broccoli and chicken Stir-Fry",
+        ingredients: ["Oil", "Chicken", "Cornstarch", "Onion", "Ginger","Garlic","Broccoli","Water","Sauces"],
+        
+      },
+      {
+        name: "Chicken Alfredo",
+        ingredients: ["fettuccine", "chicken breast", "butter", "heavy cream", "Parmesan cheese"],
+        
+      },
+      // Add more recipes here...
+    ];
+
+    // Function to render search results
+    function renderSearchResults(results) {
+      const recipeList = document.getElementById('recipeList');
+      recipeList.innerHTML = '';
+      results.forEach(recipe => {
+        const listItem = document.createElement('li');
+        listItem.textContent = recipe.name;
+        recipeList.appendChild(listItem);
+        listItem.addEventListener('click', () => addToFavorites(recipe));
+      });
+    }
+
+    // Function to search recipes based on ingredients
+    function searchRecipes(ingredients) {
+      const results = recipes.filter(recipe => ingredients.every(ingredient => recipe.ingredients.includes(ingredient)));
+      renderSearchResults(results);
+    }
+
+    // Function to display favorites
+    function displayFavorites() {
+      const favoritesList = document.getElementById('favoritesList');
+      favoritesList.innerHTML = '';
+      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      favorites.forEach(favorite => {
+        const listItem = document.createElement('li');
+        listItem.textContent = favorite.name;
+        favoritesList.appendChild(listItem);
+        listItem.addEventListener('click', () => removeFromFavorites(favorite));
+      });
+    }
+
+    // Function to add a recipe to favorites
+    function addToFavorites(recipe) {
+      let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      if (!favorites.some(favorite => favorite.name === recipe.name)) {
+        favorites.push(recipe);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        displayFavorites();
+      }
+    }
+
+    // Function to remove a recipe from favorites
+    function removeFromFavorites(recipe) {
+      let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      favorites = favorites.filter(favorite => favorite.name !== recipe.name);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      displayFavorites();
+    }
+
+    // Event listener for form submission
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const ingredients = document.getElementById('ingredientInput').value.split(',').map(ingredient => ingredient.trim());
+      searchRecipes(ingredients);
+    });
+
+    // Initial display of favorites
+    displayFavorites();
+  </script>
+</body>
+</html>

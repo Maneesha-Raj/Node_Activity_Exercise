@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Quiz Application</title>
+</head>
+
+<body>
+  <h1>Dynamic Quiz Application</h1>
+  <div id="quizContainer">
+    <div id="question"></div>
+    <div id="answers"></div>
+    <button id="prevButton">Previous</button>
+    <button id="nextButton">Next</button>
+    <button id="submitButton">Submit</button>
+    <div id="feedback"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "What is the capital of France?",
+        answers: ["Paris", "London", "Berlin", "Madrid"],
+        correctAnswer: "Paris"
+      },
+      {
+        question: "Who wrote 'To Kill a Mockingbird'?",
+        answers: ["Harper Lee", "Jane Austen", "Mark Twain", "F. Scott Fitzgerald"],
+        correctAnswer: "Harper Lee"
+      },
+     
+    ];
+
+    let currentQuestion = 0;
+    let userAnswers = [];
+    let score = 0;
+
+    const quizContainer = document.getElementById('quizContainer');
+    const questionElement = document.getElementById('question');
+    const answersElement = document.getElementById('answers');
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
+    const submitButton = document.getElementById('submitButton');
+    const feedbackElement = document.getElementById('feedback');
+
+    function displayQuestion() {
+      const question = questions[currentQuestion];
+      questionElement.textContent = question.question;
+      answersElement.innerHTML = '';
+      question.answers.forEach((answer, index) => {
+        const answerElement = document.createElement('input');
+        answerElement.type = 'radio';
+        answerElement.name = 'answer';
+        answerElement.value = answer;
+        answerElement.id = `answer${index}`;
+        const labelElement = document.createElement('label');
+        labelElement.htmlFor = `answer${index}`;
+        labelElement.textContent = answer;
+        answersElement.appendChild(answerElement);
+        answersElement.appendChild(labelElement);
+        answersElement.appendChild(document.createElement('br'));
+      });
+    }
+
+    function showFeedback() {
+      feedbackElement.textContent = userAnswers[currentQuestion] === questions[currentQuestion].correctAnswer ? "Correct!" : "Incorrect!";
+    }
+
+    function updateScore() {
+      score = userAnswers.reduce((acc, curr, index) => {
+        return curr === questions[index].correctAnswer ? acc + 1 : acc;
+      }, 0);
+    }
+
+    function showScore() {
+      quizContainer.innerHTML = `<h2>Your Score: ${score} out of ${questions.length}</h2>`;
+    }
+
+    prevButton.addEventListener('click', () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        displayQuestion();
+      }
+    });
+
+    nextButton.addEventListener('click', () => {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        displayQuestion();
+      }
+    });
+
+    submitButton.addEventListener('click', () => {
+      const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+      if (selectedAnswer) {
+        userAnswers[currentQuestion] = selectedAnswer.value;
+        showFeedback();
+        updateScore();
+      } else {
+        alert("Please select an answer.");
+      }
+    });
+
+    displayQuestion();
+  </script>
+</body>
+</html>
